@@ -306,14 +306,16 @@ async function saveMemo(memo) {
 async function updateMemo(id, fields) {
   setSyncStatus('syncing', '수정 중...');
   try {
+    const numId = parseInt(id, 10);
     const updateData = {};
     if (fields.text !== undefined) { updateData.text = fields.text; updateData.tags = JSON.stringify(autoTag(fields.text)); }
     if (fields.priority !== undefined) updateData.priority = fields.priority;
-    const { error } = await db.from('memos').update(updateData).eq('id', id);
+    const { error } = await db.from('memos').update(updateData).eq('id', numId);
     if (error) throw error;
     setSyncStatus('online', '동기화됨 ✓');
     await loadMemos();
   } catch(e) {
+    console.error('수정 오류:', e);
     setSyncStatus('error', '수정 실패');
   }
 }
@@ -321,14 +323,18 @@ async function updateMemo(id, fields) {
 async function removeMemo(id) {
   setSyncStatus('syncing', '삭제 중...');
   try {
-    const { error } = await db.from('memos').delete().eq('id', id);
+    const numId = parseInt(id, 10);
+    const { data, error } = await db.from('memos').delete().eq('id', numId).select();
     if (error) throw error;
     setSyncStatus('online', '동기화됨 ✓');
-    memos = memos.filter(m => m.id !== id);
+    memos = memos.filter(m => m.id !== id && m.id !== numId);
     updateCount();
     renderMemos();
+    showToast('🗑 삭제됨');
   } catch(e) {
-    setSyncStatus('error', '삭제 실패');
+    console.error('삭제 오류:', e);
+    setSyncStatus('error', '삭제 실패: ' + (e.message || ''));
+    showToast('❌ 삭제 실패');
   }
 }
 
