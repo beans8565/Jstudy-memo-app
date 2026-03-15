@@ -2,7 +2,7 @@
   "name": "EDU 메모장",
   "short_name": "EDU메모",
   "description": "EDU Curation Lounge 전용 메모앱",
-  "start_url": "./memo.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1410",
   "theme_color": "#1a1410",
