@@ -324,16 +324,14 @@ async function removeMemo(id) {
   setSyncStatus('syncing', '삭제 중...');
   try {
     const numId = parseInt(id, 10);
-    const { data, error } = await db.from('memos').delete().eq('id', numId).select();
+    const { error } = await db.from('memos').delete().eq('id', numId);
     if (error) throw error;
     setSyncStatus('online', '동기화됨 ✓');
-    memos = memos.filter(m => m.id !== id && m.id !== numId);
-    updateCount();
-    renderMemos();
     showToast('🗑 삭제됨');
+    await loadMemos();
   } catch(e) {
     console.error('삭제 오류:', e);
-    setSyncStatus('error', '삭제 실패: ' + (e.message || ''));
+    setSyncStatus('error', '삭제 실패');
     showToast('❌ 삭제 실패');
   }
 }
